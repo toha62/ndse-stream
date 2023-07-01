@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
-const game = require('./game');
+const start = require('./game');
 const analyse = require('./analyse');
-// const readline = require('node:readline');
-// const { stdin: input, stdout: output } = require('node:process');
 
 const options = yargs => {
   return yargs
@@ -25,7 +23,7 @@ const argv = yargs(hideBin(process.argv))
     aliases: 's',
     desc: 'Start game with logging result',
     builder: options,
-    handler: game,
+    handler: start,
   })
   .command({
     command: 'analyse',
@@ -37,4 +35,4 @@ const argv = yargs(hideBin(process.argv))
   .demandCommand(1, 1, 'You need at least one command before moving on')
   .strict()
   .help('h')
-  .argv
+  .argv;
