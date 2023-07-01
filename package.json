@@ -1,0 +1,18 @@
+{
+  "name": "coin-stream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "coin.js",
+  "bin": {
+    "coin": "./coin.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "toha62",
+  "license": "ISC",
+  "dependencies": {
+    "yargs": "^17.7.2"
+  }
+}
