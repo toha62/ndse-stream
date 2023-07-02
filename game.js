@@ -1,5 +1,8 @@
 const readline = require('node:readline');
 const { stdin: input, stdout: output } = require('node:process');
+const fs = require('node:fs');
+const path = require('path');
+const { resolve } = require('node:path');
 
 const randomNumber = () => {
   return Math.floor(Math.random() * 2 + 1);
@@ -53,6 +56,29 @@ const promptToContinue = () => {
   });  
 }
 
+const writeLog = data => {
+  return new Promise((resolve, reject) => {
+    const filePath = path.join(__dirname, 'output.txt');
+    // console.log(`* ${filePath} *`);
+    // console.log(data);
+
+    const writeStream = fs.createWriteStream(filePath, {flags: 'a'});
+    
+    writeStream.write(data, 'UTF8');
+    // console.log(writeStream);
+    writeStream.end();
+
+    writeStream.on('finish', () => {
+      resolve();
+    });
+
+    writeStream.on('error', (err) => {
+      console.error('error');
+      reject(err);
+    });
+  });  
+};
+
 const start = async (argv) => {
   const results = [];
   console.log(argv);
@@ -60,15 +86,15 @@ const start = async (argv) => {
   while(true) {
     const win = await game();    
     
-    results.push(win);
+    results.push({ win });
     
     const isContinue = await promptToContinue();
 
     if (!isContinue) {
-      console.log(
-        "Результаты: угадали - ", results.reduce((acc, item) => Number(item) + acc, 0), 
-        ". не угадали - ", results.length - results.reduce((acc, item) => Number(item) + acc, 0), "."
-      );
+      const winCount = results.reduce((acc, { win }) => Number(win) + acc, 0);
+
+      console.log(`Результаты: угадано - ${winCount}, не угадано - ${results.length - winCount}.`);
+      await writeLog(JSON.stringify(results));
       process.exit(0);      
     }
   }  
