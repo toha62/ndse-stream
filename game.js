@@ -59,13 +59,9 @@ const promptToContinue = () => {
 const writeLog = data => {
   return new Promise((resolve, reject) => {
     const filePath = path.join(__dirname, 'output.txt');
-    // console.log(`* ${filePath} *`);
-    // console.log(data);
-
     const writeStream = fs.createWriteStream(filePath, {flags: 'a'});
     
-    writeStream.write(data, 'UTF8');
-    // console.log(writeStream);
+    writeStream.write(data, 'UTF8');    
     writeStream.end();
 
     writeStream.on('finish', () => {
@@ -92,9 +88,11 @@ const start = async (argv) => {
 
     if (!isContinue) {
       const winCount = results.reduce((acc, { win }) => Number(win) + acc, 0);
+      const resultStr = JSON.stringify(results);
 
       console.log(`Результаты: угадано - ${winCount}, не угадано - ${results.length - winCount}.`);
-      await writeLog(JSON.stringify(results));
+      
+      await writeLog(resultStr.slice(1, resultStr.length - 1) + ',');
       process.exit(0);      
     }
   }  
