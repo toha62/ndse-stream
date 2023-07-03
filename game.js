@@ -1,8 +1,7 @@
 const readline = require('node:readline');
-const { stdin: input, stdout: output } = require('node:process');
+const { stdin: input, stdout: output, argv } = require('node:process');
 const fs = require('node:fs');
 const path = require('path');
-const { resolve } = require('node:path');
 
 const randomNumber = () => {
   return Math.floor(Math.random() * 2 + 1);
@@ -56,9 +55,9 @@ const promptToContinue = () => {
   });  
 }
 
-const writeLog = data => {
+const writeLog = (file, data) => {
   return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, 'output.txt');
+    const filePath = path.join(__dirname, file);
     const writeStream = fs.createWriteStream(filePath, {flags: 'a'});
     
     writeStream.write(data, 'UTF8');    
@@ -69,6 +68,27 @@ const writeLog = data => {
     });
 
     writeStream.on('error', (err) => {
+      console.error('error');
+      reject(err);
+    });
+  });  
+};
+
+const readLog = (file) => {
+  return new Promise((resolve, reject) => {
+    const filePath = path.join(__dirname, file);
+    const readStream = fs.createReadStream(filePath);
+    let data = '';
+    
+    readStream.setEncoding('UTF8');    
+    readStream.on('data', chank => data += chank);
+
+    readStream.on('end', () => {
+      console.log('Log readed');
+      resolve(data);
+    });
+
+    readStream.on('error', (err) => {
       console.error('error');
       reject(err);
     });
@@ -92,10 +112,23 @@ const start = async (argv) => {
 
       console.log(`Результаты: угадано - ${winCount}, не угадано - ${results.length - winCount}.`);
       
-      await writeLog(resultStr.slice(1, resultStr.length - 1) + ',');
+      await writeLog(argv.f, resultStr.slice(1, resultStr.length - 1) + ',');
       process.exit(0);      
     }
   }  
-}
+};
 
-module.exports = start;
+const analyse = async (argv) => {
+  const logData = await readLog(argv.f);
+  const results = JSON.parse(`[${logData.slice(0, logData.length - 1)}]`);
+  const winCount = results.reduce((acc, { win }) => Number(win) + acc, 0);
+  
+  console.log(
+    '\nСтатистика игр:\n -------------\n',
+    'Общее количество партий: ', results.length, '\n',
+    'Количество выигранных/проигранных партий: ', winCount, '/', results.length - winCount, '\n',
+    'Процентное соотношение выигранных партий: ', (100 * winCount / results.length).toFixed(), '%'
+  );
+};
+
+module.exports = { start, analyse };

@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
-const start = require('./game');
-const analyse = require('./analyse');
+const { start, analyse } = require('./game');
 
 const options = yargs => {
   return yargs
